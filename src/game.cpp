@@ -19,6 +19,7 @@ class Game {
 
         //Declare textures
         SDL_Texture* background_menu;
+        SDL_Texture* knight_idle;
 
         //Declare destination rectangles
         SDL_Rect background_dest;
@@ -65,13 +66,16 @@ class Game {
 
         void load_media() {
             //Load images as surfaces
-            SDL_Surface* surf_background_menu = IMG_Load("imgs/background-menu.png");
+            SDL_Surface* surf_background_menu = IMG_Load("imgs/backgrounds/background-menu.png");
+            SDL_Surface* surf_knight_idle = IMG_Load("imgs/heroes/knight-idle.png");
 
             //Convert surfaces to textures
             background_menu = SDL_CreateTextureFromSurface(rend, surf_background_menu);
+            knight_idle = SDL_CreateTextureFromSurface(rend, surf_knight_idle);
 
             //Destroy surfaces
             SDL_FreeSurface(surf_background_menu);
+            SDL_FreeSurface(surf_knight_idle);
         }
 
         void render() {
@@ -80,6 +84,9 @@ class Game {
 
             //Draw images
             SDL_RenderCopy(rend, background_menu, NULL, NULL);
+            SDL_RenderCopy(rend, knight_idle, NULL, NULL);
+
+            //Finalise
             SDL_RenderPresent(rend);
         }
 
