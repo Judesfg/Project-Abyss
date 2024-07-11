@@ -42,8 +42,9 @@ class Game {
 
         bool loadMedia() {
             bool success = true;
+            return success;
 
-            background_menu = SDL_LoadJPG()
+            //background_menu = SDL_LoadJPG()
         }
 
         void gameLoop() {
