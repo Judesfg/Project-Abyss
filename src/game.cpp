@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
+#include "Sprite.h"
 
 enum State {MENU, SETTINGS, GAME};
 
@@ -17,24 +17,23 @@ class Game {
         SDL_Surface* screenSurface;
         SDL_Event e;
 
-        //Declare textures
-        SDL_Texture* background_menu;
-        SDL_Texture* knight_idle;
-
-        //Declare destination rectangles
-        SDL_Rect background_dest;
 
 
         Game(int width, int height) {
             quit = false;
             SCREEN_WIDTH = width;
             SCREEN_HEIGHT = height;
-            background_dest.w = width;
-            background_dest.h = height;
-            background_dest.x = 0;
-            background_dest.y = 0;
             create_window();
             load_media();
+
+            //REMOVE LATER
+            knight = Sprite(SCREEN_WIDTH/2 - 32, SCREEN_HEIGHT/2 - 16, 32, 32, 0, 0);
+            knight.setTexture(knight_idle);
+            wizard = Sprite(SCREEN_WIDTH/4 - 32, SCREEN_HEIGHT/2 - 16, 32, 32, 0, 0);
+            wizard.setTexture(wizard_idle);
+            assassin = Sprite(3*SCREEN_WIDTH/4 - 32, SCREEN_HEIGHT/2 - 16, 32, 32, 0, 0);
+            assassin.setTexture(assassin_idle);
+
             game_loop();
         }
 
@@ -66,16 +65,25 @@ class Game {
 
         void load_media() {
             //Load images as surfaces
+            SDL_Surface* surf_default = IMG_Load("imgs/default-tex.png");
             SDL_Surface* surf_background_menu = IMG_Load("imgs/backgrounds/background-menu.png");
-            SDL_Surface* surf_knight_idle = IMG_Load("imgs/heroes/knight-idle.png");
+            SDL_Surface* surf_knight_idle = IMG_Load("imgs/heroes/knight-idle-sheet.png");
+            SDL_Surface* surf_wizard_idle = IMG_Load("imgs/heroes/wizard-idle-sheet.png");
+            SDL_Surface* surf_assassin_idle = IMG_Load("imgs/heroes/assassin-idle-sheet.png");
 
             //Convert surfaces to textures
+            default_tex = SDL_CreateTextureFromSurface(rend, surf_default);
             background_menu = SDL_CreateTextureFromSurface(rend, surf_background_menu);
             knight_idle = SDL_CreateTextureFromSurface(rend, surf_knight_idle);
+            wizard_idle = SDL_CreateTextureFromSurface(rend, surf_wizard_idle);
+            assassin_idle = SDL_CreateTextureFromSurface(rend, surf_assassin_idle);
 
             //Destroy surfaces
+            SDL_FreeSurface(surf_default);
             SDL_FreeSurface(surf_background_menu);
             SDL_FreeSurface(surf_knight_idle);
+            SDL_FreeSurface(surf_wizard_idle);
+            SDL_FreeSurface(surf_assassin_idle);
         }
 
         void render() {
@@ -84,7 +92,9 @@ class Game {
 
             //Draw images
             SDL_RenderCopy(rend, background_menu, NULL, NULL);
-            SDL_RenderCopy(rend, knight_idle, NULL, NULL);
+            SDL_RenderCopy(rend, knight.tex, &knight.src_rect, &knight.dest_rect);
+            SDL_RenderCopy(rend, wizard.tex, &wizard.src_rect, &wizard.dest_rect);
+            SDL_RenderCopy(rend, assassin.tex, &assassin.src_rect, &assassin.dest_rect);
 
             //Finalise
             SDL_RenderPresent(rend);
@@ -105,14 +115,23 @@ class Game {
         }
 
         void game_loop() {
+            int tickCounter;
             while (quit == false) {
+                tickCounter = (tickCounter + 1) % 60;
+                if ((tickCounter % 15) == 0) {
+                    //Update all sprites
+                    knight.nextFrame();
+                    wizard.nextFrame();
+                    assassin.nextFrame();
+                }
                 while(SDL_PollEvent(&e)) {
-                    render();
-                    SDL_Delay(1000/60); 
+                    
                     if(e.type == SDL_QUIT) {
                         quit = true;
                     }
                 }
+                render();
+                SDL_Delay(1000/60); 
             }
             game_exit();
         }

@@ -1,4 +1,5 @@
-#include <iostream>
+#pragma once
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -10,20 +11,14 @@ class Sprite {
         int h;
         int u;
         int v;
+        int scale;
         SDL_Texture* tex;
+        SDL_Rect src_rect;
+        SDL_Rect dest_rect;
 
-        sprite(int xIn, int yIn, int wIn, int hIn, SDL_Texture* texIn) {
-            x = xIn;
-            y = yIn;
-            w = wIn;
-            h = hIn;
-            u = 0;
-            v = 0;
-            tex = texIn;
-        }
-        
-        void nextFrame() {
-            u = (u + w) % (w * 4);
-        }
+        Sprite(int xIn = 0, int yIn = 0, int wIn = 32, int hIn = 32, int uIn = 0, int vIn = 0);
 
-}
+        void setTexture(SDL_Texture* texIn);
+        void nextFrame();
+        void setRects();
+};
